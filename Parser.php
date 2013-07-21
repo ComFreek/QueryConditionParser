@@ -1,6 +1,6 @@
 <?php
 
-require_once('ParserStrStream.php');
+require_once(__DIR__ . '/ParserStrStream.php');
 
 /**
  * Parses condition strings
