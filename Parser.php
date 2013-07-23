@@ -74,8 +74,10 @@ class Parser {
 					// the longest operator has the highest precedence
 					$highestOp = '';
 					$highestOpPos = 0;
+					
+					$subStream = ParserStrStream::createRefCopy($stream);
 					do {
-						$curGroup['op'] .= $stream->cur();
+						$curGroup['op'] .= $subStream->cur();
 						
 						// possible operator found
 						if (in_array($curGroup['op'], self::$operators)) {
@@ -84,22 +86,13 @@ class Parser {
 							$highestOpPos = $relPos;
 						}
 						$relPos++;
-					} while ($relPos<self::$maxOpLength && $stream->next() !== false);
+					} while ($relPos<self::$maxOpLength && $subStream->next() !== false);
 					
 					$curGroup['op'] = $highestOp;
 					
-					// if we searched too far (i.e. the operator's length < $maxOpLength)
-					if ($state == self::ST_VAL && $relPos > $highestOpPos) {
-						for (; $relPos > $highestOpPos + 1; $relPos--) {
-							$stream->movePrev();
-						}
-					}
-					
-					// if we haven't found any possible operator
-					else if ($state == self::ST_ATTR) {
-						for (; $relPos > 0; $relPos--) {
-							$stream->movePrev();
-						}
+					// if an operator matched
+					if ($state == self::ST_VAL) {
+						$stream->moveNext($highestOpPos);
 					}
 				}
 				// current character is NOT a beginning of an operator

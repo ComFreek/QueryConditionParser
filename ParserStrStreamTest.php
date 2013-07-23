@@ -16,4 +16,14 @@ class ParserStrStreamTest extends PHPUnit_Framework_TestCase {
 		}
 		$this->assertEquals(false, $str->next());
 	}
+	
+	public function testRefCopying() {
+		$str = 'test test test';
+		$old = new ParserStrStream($str);
+		$new = ParserStrStream::createRefCopy($old);
+		
+		do {
+			$this->assertEquals($old->cur(), $new->cur());
+		} while($old->moveNext() && $new->moveNext());
+	}
 }
